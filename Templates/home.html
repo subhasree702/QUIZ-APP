@@ -1,0 +1,102 @@
+<!-- {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz App - Home</title>
+</head>
+<body style="
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  min-height:100vh;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:40px 20px;
+">
+  <h2 style="font-size:32px;margin-bottom:10px;">Welcome, {{ request.user.username }} 👋</h2>
+  <p style="color:#ccc;margin-bottom:40px;">Choose a topic to start your quiz</p>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:25px;
+    width:80%;
+    max-width:900px;
+  ">
+    {% for topic in topics %}
+    <a href="{% url 'quiz' topic.id %}" style="
+      background:rgba(255,255,255,0.15);
+      padding:40px 0;
+      border-radius:15px;
+      text-align:center;
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      font-size:18px;
+      transition:0.3s;
+      box-shadow:0 6px 18px rgba(0,0,0,0.3);
+    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      {{ topic.name }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <a href="{% url 'logout' %}" style="
+    margin-top:40px;
+    padding:10px 25px;
+    background:linear-gradient(90deg,#ff4b2b,#ff416c);
+    border-radius:10px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+  ">Logout</a>
+</body>
+</html> -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quiz App - Home</title>
+<style>
+body {
+  margin:0; font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  min-height:100vh; color:#fff; display:flex; flex-direction:column; align-items:center; padding:40px 20px;
+}
+.topic-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; width:80%; max-width:900px; }
+.topic-card { background:rgba(255,255,255,0.15); padding:40px 0; border-radius:15px; text-align:center; color:#fff; text-decoration:none; font-weight:600; font-size:18px; transition:0.3s; box-shadow:0 6px 18px rgba(0,0,0,0.3); }
+.topic-card:hover { transform:scale(1.05); }
+.btn { padding:10px 25px; border-radius:10px; color:#fff; text-decoration:none; font-weight:600; border:none; cursor:pointer; margin-top:30px; }
+.logout-btn { background:linear-gradient(90deg,#ff4b2b,#ff416c); }
+</style>
+</head>
+<body>
+
+{% if request.user.is_authenticated %}
+  <h2>Welcome, {{ request.user.username }} 👋</h2>
+  <p style="color:#ccc;margin-bottom:40px;">Choose a topic to start your quiz</p>
+{% else %}
+  <h2>Welcome to Quiz App 👋</h2>
+  <p style="color:#ccc;margin-bottom:40px;">
+    Please <a href="{% url 'login' %}" style="color:#fff; text-decoration:underline;">Login</a> 
+    or <a href="{% url 'signup' %}" style="color:#fff; text-decoration:underline;">Sign Up</a> to start quizzes.
+  </p>
+{% endif %}
+
+<div class="topic-grid">
+{% for topic in topics %}
+<a href="{% url 'quiz' topic.id %}" class="topic-card">{{ topic.name }}</a>
+{% endfor %}
+</div>
+
+{% if request.user.is_authenticated %}
+<a href="{% url 'logout' %}" class="btn logout-btn">Logout</a>
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!-- {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz - {{ topic.name }}</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      margin: 0;
+      padding: 40px;
+      color: #fff;
+    }
+    .quiz-container {
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    .question-box {
+      margin-bottom: 25px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #36d1dc, #5b86e5);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2 style="text-align:center;margin-bottom:25px;">{{ topic.name }} Quiz</h2>
+
+    <form method="POST" id="quizForm">
+      {% csrf_token %}
+      {% for q in questions %}
+      <div class="question-box">
+        <p><strong>{{ forloop.counter }}. {{ q.question_text }}</strong></p>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option1 }}"> {{ q.option1 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option2 }}"> {{ q.option2 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option3 }}"> {{ q.option3 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option4 }}"> {{ q.option4 }}</label>
+      </div>
+      {% endfor %}
+      <div style="text-align:center;">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      const questions = document.querySelectorAll(".question-box");
+      let allAnswered = true;
+
+      questions.forEach(q => {
+        const options = q.querySelectorAll("input[type='radio']");
+        const answered = Array.from(options).some(opt => opt.checked);
+        if (!answered) {
+          allAnswered = false;
+        }
+      });
+
+      if (!allAnswered) {
+        e.preventDefault();
+        alert("⚠️ Please answer all questions before submitting the quiz.");
+      }
+    });
+  </script>
+</body>
+</html> -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz - {{ topic.name }}</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      margin: 0;
+      padding: 40px;
+      color: #fff;
+    }
+    .quiz-container {
+      max-width: 850px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    .header-section {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .header-section h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .level-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #36d1dc, #5b86e5);
+      color: #fff;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 15px;
+      margin-top: 8px;
+      box-shadow: 0 3px 10px rgba(91, 134, 229, 0.4);
+    }
+    .question-box {
+      margin-bottom: 25px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 15px;
+      transition: transform 0.2s ease;
+    }
+    .question-box:hover {
+      transform: scale(1.02);
+    }
+    button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #36d1dc, #5b86e5);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(91, 134, 229, 0.3);
+      transition: transform 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="header-section">
+      <h2>{{ topic.name }} Quiz</h2>
+      <div class="level-badge">Level {{ current_level }}</div>
+    </div>
+
+    <form method="POST" id="quizForm">
+      {% csrf_token %}
+      {% for q in questions %}
+      <div class="question-box">
+        <p><strong>{{ forloop.counter }}. {{ q.question_text }}</strong></p>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option1 }}"> {{ q.option1 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option2 }}"> {{ q.option2 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option3 }}"> {{ q.option3 }}</label><br>
+        <label><input type="radio" name="{{ q.id }}" value="{{ q.option4 }}"> {{ q.option4 }}</label>
+      </div>
+      {% endfor %}
+      <div style="text-align:center;">
+        <button type="submit">Submit Quiz</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // ✅ Prevent submission if any question is unanswered
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      const questions = document.querySelectorAll(".question-box");
+      let allAnswered = true;
+
+      questions.forEach(q => {
+        const options = q.querySelectorAll("input[type='radio']");
+        const answered = Array.from(options).some(opt => opt.checked);
+        if (!answered) {
+          allAnswered = false;
+        }
+      });
+
+      if (!allAnswered) {
+        e.preventDefault();
+        alert("⚠️ Please answer all questions before submitting the quiz.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Result</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      margin: 0;
+      padding: 40px;
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      width: 90%;
+      max-width: 1100px;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      flex: 1;
+      min-width: 320px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 6px;
+    }
+
+    .btn-next {
+      background: linear-gradient(90deg, #36d1dc, #5b86e5);
+    }
+
+    .btn-other {
+      background: linear-gradient(90deg, #007bff, #00b4d8);
+    }
+
+    .btn-logout {
+      background: linear-gradient(90deg, #ff4b2b, #ff416c);
+    }
+
+    .wrong-item {
+      text-align: left;
+      margin-bottom: 12px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+    }
+
+    .level-heading {
+      color: #36d1dc;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+
+    canvas {
+      margin: 12px auto;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Quiz Result</h2>
+      <p><strong>{{ username }}</strong>, your score: <strong style="color:#4CAF50;">{{ score }}</strong> / {{ total }}
+      </p>
+      <p>Level Completed: <strong>{{ completed_level }}</strong></p>
+
+      <!-- Pie chart (always shown on result pages that show a score) -->
+      <canvas id="resultChart" width="260" height="200"></canvas>
+
+      <div style="margin-top:16px;">
+        {# Case: user passed both levels #}
+        {% if all_levels_completed %}
+        <p style="color:#4CAF50; font-weight:700;">🎉 You completed both levels!</p>
+        <a href="{% url 'reset_level' topic.id %}" class="btn btn-other">Choose Another Subject →</a>
+        <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+
+        {# Case: Passed Level 1 (eligible to attempt Level 2) #}
+        {% elif eligible and current_level == 2 %}
+        <p style="color:#4CAF50; font-weight:700;">✅ Passed Level 1</p>
+        <a href="{% url 'next_level' topic.id %}" class="btn btn-next">Next Level →</a>
+        <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+
+        {# Case: Failed Level 1 #}
+        {% elif not eligible and current_level == 1 %}
+        <p style="color:#ff4d4d; font-weight:700;">❌ Sorry, you are not eligible for Level 2.</p>
+        <a href="{% url 'reset_level' topic.id %}" class="btn btn-other">Choose Another Subject →</a>
+        <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+
+        {# NEW: Case: Failed Level 2 -> show Try Again + Logout (no other changes) #}
+        {% elif not eligible and completed_level == 2 %}
+        <p style="color:#ff4d4d; font-weight:700;">❌ You didn't pass Level 2. Try again!</p>
+        <a href="{% url 'quiz' topic.id %}" class="btn btn-next">Try Again</a>
+        <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+        <a href="{% url 'reset_level' topic.id %}?keep_level=2" class="btn btn-other">
+          Choose Another Subject →
+        </a>
+
+
+        {# Default fallback #}
+        {% else %}
+        <p style="color:#ffc107;">Result recorded.</p>
+        <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Show aggregated wrong answers only after both levels completed #}
+    {% if all_levels_completed and wrong_questions %}
+    <div class="card">
+      <h2>Review Wrong Answers (All Levels)</h2>
+
+      {% regroup wrong_questions by level as level_groups %}
+      {% for group in level_groups %}
+      <div class="level-heading">Level {{ group.grouper }} Mistakes</div>
+      {% for item in group.list %}
+      <div class="wrong-item">
+        <strong>{{ forloop.counter }}. {{ item.question }}</strong>
+        <div style="color:#ff6b6b;">Your Answer: {{ item.selected }}</div>
+        <div style="color:#7ED957;">Correct Answer: {{ item.correct }}</div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const score = {{ score }};
+    const total = {{ total }};
+    const ctx = document.getElementById('resultChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Correct', 'Wrong'],
+        datasets: [{
+          data: [score, total - score],
+          backgroundColor: ['#4CAF50', '#ff4d4d'],
+          borderColor: '#fff',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
+      }
+    });
+  </script>
+</body>
+
+</html>
